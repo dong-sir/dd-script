@@ -46,8 +46,8 @@ const getTodayCheckStatus = async () => {
     return {error: data.err_no !== 0, isCheck: data.data}
 }
 
-// 抽奖
-const draw = async () => {
+// 幸运抽奖
+const luckyLottery = async () => {
     let {error, isDraw} = await getTodayDrawStatus();
     if (error) return console.log('查询抽奖次数失败');
     if (isDraw) return console.log('今日已无免费抽奖次数');
@@ -107,5 +107,9 @@ const subscribeMessage = async (event) => {
     });
     console.log(data)
 }
-
-module.exports = checkIn();
+exports.main_handler = async (event, context) => {
+    console.log('start');
+    await checkIn();
+    await luckyLottery();
+    console.log('end');
+};

@@ -30,9 +30,9 @@ const checkIn = async () => {
     let {data} = await axios({url: baseUrl + apiUrl.checkIn, method: 'post', headers: {Cookie: cookie}});
     if (data.err_no) {
         console.log(data);
-        await subscribeMessage({award: '无', remark: '签到失败'});
+        await subscribeMessage('签到失败');
     } else {
-        await subscribeMessage({award: `当前积分：${data.data.sum_point}`, remark: '签到成功'});
+        await subscribeMessage(`签到成功，当前积分：${data.data.sum_point}`);
     }
 }
 
@@ -41,7 +41,7 @@ const getTodayCheckStatus = async () => {
     const {cookie, baseUrl, apiUrl} = config;
     let {data} = await axios(baseUrl + apiUrl.getTodayStatus, {headers: {Cookie: cookie}});
     if (data.err_no) {
-        await subscribeMessage({award: '无', remark: data.err_msg});
+        console.log(data);
     }
     return {error: data.err_no !== 0, isCheck: data.data}
 }
@@ -52,7 +52,7 @@ const luckyLottery = async () => {
     if (error) return console.log('查询抽奖次数失败');
     if (isDraw) return console.log('今日已无免费抽奖次数');
     const {cookie, baseUrl, apiUrl} = config;
-    let {data} = await axios({url: baseUrl + apiUrl.drawLottery, method: 'post', headers: {Cookie: cookie}});
+    let {data} = await axios({url: baseUrl + apiUrl.drawLottery, method: 'POST', headers: {Cookie: cookie}});
     if (data.err_no) return console.log('免费抽奖失败');
     console.log(`恭喜抽到：${data.data.lottery_name}`);
 }
@@ -73,7 +73,7 @@ const getTodayDrawStatus = async () => {
  * @see https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/access-token/auth.getAccessToken.html
  */
 const getWxAccessToken = async () => {
-    let {data} = await axios({url: config.openapi.baseURL + '/token?grant_type=client_credential&appid=&secret=',method: 'get'});
+    let {data} = await axios(config.openapi.baseURL + '/token?grant_type=client_credential&appid=' + config.openapi.appid + '&secret=' + config.openapi.appsecret);
     return data;
 }
 
@@ -82,7 +82,7 @@ const getWxAccessToken = async () => {
  * @see https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/subscribe-message/subscribeMessage.send.html
  * @returns
  */
-const subscribeMessage = async (event) => {
+const subscribeMessage = async (msg) => {
     // 获取小程序接口调用凭据
     let {access_token} = await getWxAccessToken();
     let {data} = await axios({
@@ -93,20 +93,18 @@ const subscribeMessage = async (event) => {
             template_id: config.openapi.templateId,
             miniprogram_state: "developer",
             data: {
-                thing1:{
-                  value: '掘金签到'
-                },
                 thing2:{
-                  value: event.award
+                    value: '掘金签到'
                 },
-                thing10:{
-                  value: event.remark
+                thing1:{
+                    value: msg
                 }
             }
         }
     });
     console.log(data)
 }
+
 exports.main_handler = async (event, context) => {
     console.log('start');
     await checkIn();

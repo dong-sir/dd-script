@@ -73,7 +73,7 @@ const getTodayDrawStatus = async () => {
  * @see https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/access-token/auth.getAccessToken.html
  */
 const getWxAccessToken = async () => {
-    let {data} = await axios({url: config.openapi.baseURL + '/token?grant_type=client_credential&appid=wxeddbdecdf7a1c61a&secret=b4d56bc3e76822676f82e8f337c2cdee',method: 'get'});
+    let {data} = await axios({url: config.openapi.baseURL + '/token?grant_type=client_credential&appid=&secret=',method: 'get'});
     return data;
 }
 
